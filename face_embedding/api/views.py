@@ -59,40 +59,57 @@ MIN_DISTANCE = 0.38
 
 @api_view(('POST',))
 def create(request):
-    print('create attemp')
     if request.method == "POST":
         try:
             first_name = request.data['first_name']
             last_name = request.data['last_name']
-            #Todoss
+            #Todos
             image_url = request.data['image_url']
             face_embedding = request.data['face_embedding']
             embedding_str = format_face_embedding(face_embedding)
-            request.data['face_embedding']  =embedding_str
-
+            # request.data['face_embedding']  = embedding_str
         except KeyError:
             data = {
                 "message": "Key not found"
             }
             return Response(data=data, status=HTTP_400_BAD_REQUEST)
         
-        # pickle = PickledObjectField()
-        # print(face_embedding)
-        person = Person(first_name, last_name, image_url, face_embedding=embedding_str)
-        serializer = PersonSerializer(data=request.data )
 
-        if serializer.is_valid():
-            serializer.save()
+        person = Person(first_name=first_name, last_name=last_name )
+        face_embedding =  FaceEmbedding(image_url=image_url, face_embedding=embedding_str, person=person)
+
+        # serializer = PersonSerializer(data=request.data )
+
+        # if serializer.is_valid():
+        #     serializer.save()
+        #     data = {
+        #         "serializer": serializer.data,
+        #         "message":  "created successfully"
+        #     }
+        #     return Response(data=data, status=HTTP_201_CREATED)
+           
+        try: 
+            person.save()
+            face_embedding.save()
+
             data = {
-                "serializer": serializer.data,
-                "message":  "created successfully"
+                'faces': [
+                    {
+                        "first_name": person.first_name,
+                        "last_name": person.last_name,
+                        "image_url": face_embedding.image_url,
+                        "created_at": person.created_at,
+                        'updated_at': person.update_at
+                    }
+                ] 
             }
             return Response(data=data, status=HTTP_201_CREATED)
-           
-        else:
-            data = {
-                "message": "Serializer is not valid."
-            }
+        except Exception as  e :
+            data = {}
+            if hasattr(e, 'message'):
+                data['message'] = e.message
+            else:
+                data['message'] = e 
             return Response(data=data, status=HTTP_400_BAD_REQUEST)
 
 @api_view( ('POST', ))
@@ -131,16 +148,22 @@ def compare(request):
 
         return Response(data=data,status=HTTP_400_BAD_REQUEST)
     
+    # print(type(target_face_embedding))
+    # print(type(target_face_embedding[0]))
+    # print(len(target_face_embedding))
+    # print(target_face_embedding)
+
     if type(target_face_embedding) != list:
         data = {
             "message": "face_embedding need to be array of int or array of float"
         }
         return Response(data=data,status=HTTP_400_BAD_REQUEST)
 
-    if type(target_face_embedding[0]) != int and type(target_face_embedding[0]) != float: 
+    if not(  type(target_face_embedding[0]) != int or type(target_face_embedding[0]) != float ): 
         data = {
             "message": "face_embedding need to be array of int or array of float"
         }
+
         return Response(data=data, status=HTTP_400_BAD_REQUEST)
 
     #start processing    
@@ -151,13 +174,13 @@ def compare(request):
         except FaceEmbedding.DoesNotExist:
             #that person doesn't have face_embedding save yet
             continue
-
+        print(len(person_faces))
         for face in person_faces:
             face_embed = face.face_embedding
             embed = get_face_embedding(face_embed)
             try:
                 distance = cosine(embed, target_face_embedding)
-            except  ValueError and TypeError:
+            except  ValueError or TypeError:
                 continue
             print(distance)
             if distance < MIN_DISTANCE:

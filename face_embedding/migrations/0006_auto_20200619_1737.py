@@ -33,9 +33,11 @@ class Migration(migrations.Migration):
             name='FaceEmbedding',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('face_embedding', models.TextField(null=True)),
-                ('image_url', models.TextField(null=True)),
-                ('person', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='face', to='face_embedding.Person')),
+                ('face_embedding', models.TextField(null=False)),
+                ('image_url', models.TextField(null=False)),
+                ('person', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='face', 
+                null=False,
+                to='face_embedding.Person')),
             ],
         ),
     ]

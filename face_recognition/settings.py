@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'face_embedding.apps.FaceEmbeddingConfig',
     
     'rest_framework',
+    'rest_framework.authtoken',
     'django_mysql',
     
     'django.contrib.admin',
@@ -43,6 +44,16 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        # 'rest_framework.authentication.TokenAuthentication',
+        'face_embedding.api.account.Authentication.MyTokenAuthentication'
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        # 'rest_framework.permission.IsAuthenticated',
+    ]
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

@@ -17,6 +17,6 @@ from django.contrib import admin
 from django.urls import path, include
 
 urlpatterns = [
-    path('api/face_embedding/', include('face_embedding.api.urls')),
+    path('api/', include('face_embedding.api.urls')),
     path('admin/', admin.site.urls),
 ]
