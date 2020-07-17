@@ -1,26 +1,37 @@
 from rest_framework import serializers
-from face_embedding.models import User
+from django.contrib.auth.models import User
+from face_embedding.models import Organization
 
 
 class UserSerializer(serializers.ModelSerializer):
-    confirm_password = serializers.CharField(style={'input_type': 'password'}, write_only=True)
+    def to_representation(self, value):
+        user = User.objects.get(id=value)
+        data = {
+            'id': user.id,
+            'email': user.email,
+            'username': user.username
+        }
+        return data
 
+
+class OrganizationSerializer(serializers.ModelSerializer):
     class Meta:
-        model = User
-        fields = ['email', 'username', 'password', 'confirm_password']
+        model = Organization
+        fields = ['id', 'name', 'created_by', 'created_at']
         extra_kwargs = {
-            'password': {'write_only': True},
+            'created_by': {
+                'required': True,
+            }
+
         }
 
-    def save(self):
-        user = User(
-            email=self.validated_data['email'],
-            username=self.validated_data['username'],
-        )
-        password = self.validated_data['password']
-        confirm_password = self.validated_data['confirm_password']
-        if password != confirm_password:
-            raise serializers.ValidationError({'password': 'Passwords must match.'})
-        user.set_password(password)
-        user.save()
-        return user
+    def to_representation(self, instance):
+        data = super(OrganizationSerializer, self).to_representation(instance)
+        data['name'] = instance.name.title()
+        try:
+            user = User.objects.get(username=instance.created_by)
+            user_serializer = UserSerializer(user.id)
+            data['created_by'] = user_serializer.data
+            return data
+        except User.DoesNotExist:
+            pass

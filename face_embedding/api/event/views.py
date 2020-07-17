@@ -47,17 +47,15 @@ def create(request):
     organization = OrganizationSerializer(data=data)
     if organization.is_valid():
         org = organization.save()
-        print(f'org is is {org.id}')
         serializer = EmployeeSerializer(data={
             'name': user.username,
             'email': user.email,
             'role': 'admin',
             'position':  'N/A',
             'department': 'N/A',
-            'organization': org,
+            'organization': org.id,
         })
         if serializer.is_valid():
-            print(serializer.data)
             serializer.save()
         else:
             raise serializers.ValidationError(serializer.errors)

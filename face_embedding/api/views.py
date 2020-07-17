@@ -7,7 +7,7 @@ from rest_framework.parsers import JSONParser
 from scipy.spatial.distance import cosine
 
 from .serializer import PersonSerializer
-from face_embedding.models import Person, FaceEmbedding,  format_face_embedding, get_face_embedding
+from face_embedding.models import  FaceEmbedding,  format_face_embedding, get_face_embedding
 
 
 MIN_DISTANCE = 0.38
@@ -56,6 +56,7 @@ MIN_DISTANCE = 0.38
 #         "url": ''
 #     }
 # ]
+
 
 @api_view(('POST',))
 def create(request):

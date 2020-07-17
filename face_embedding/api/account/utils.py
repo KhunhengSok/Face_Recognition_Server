@@ -45,7 +45,7 @@ def validate_username(username, organization_name):
 
     # try:
     #     organization = Organization.objects.get(name=organization_name)
-    #     employee = Employee.objects.get(organization=organization, name=name)
+    #     employee = employee.objects.get(organization=organization, name=name)
     #     if employee:
     #         errors = {
     #             'name': 'The name is already exist in your organization.'
