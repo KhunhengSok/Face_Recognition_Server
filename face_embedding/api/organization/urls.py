@@ -6,5 +6,7 @@ urlpatterns = [
     path('user', views.index, name='index'),
     path('<id>', views.show, name='index'),
     path('<id>/update', views.update, name='index'),
+    path('<id>/employee', views.employee, name='index'),
+
     # ToDo: add employees
 ]

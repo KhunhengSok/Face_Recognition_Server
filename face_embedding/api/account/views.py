@@ -8,8 +8,9 @@ from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import authenticate, login
 # from rest_framework.authentication import authenticate
 
-from face_embedding.models import User
+from face_embedding.models import User, Organization
 from .serializers import UserSerializer
+from face_embedding.api.organization.serializers import OrganizationSerializer
 from .Authentication import MyTokenAuthentication
 from .utils import validate_email, validate_username
 
@@ -87,3 +88,14 @@ def login(request):
             'token':    token.key
         }
         return Response(data, status=HTTP_200_OK)
+
+
+# urls /account/organizations
+@api_view(('Get',))
+@permission_classes([IsAuthenticated])
+def organizations(request):
+    user = request.user
+    orgs = Organization.objects.filter(created_by=user.id).all()
+    org_serializer = OrganizationSerializer(orgs, many=True)
+    # print(org_serializer.is_valid(True))
+    return Response(org_serializer.data, HTTP_200_OK)

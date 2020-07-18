@@ -29,6 +29,7 @@ def show(request, id):
 
 
 @api_view(('Get',))
+@permission_classes([IsAuthenticated])
 def index(request):
     user = request.user
     orgs = Organization.objects.filter(created_by=user.id).all()
@@ -47,17 +48,16 @@ def create(request):
     organization = OrganizationSerializer(data=data)
     if organization.is_valid():
         org = organization.save()
-        print(f'org is is {org.id}')
         serializer = EmployeeSerializer(data={
             'name': user.username,
             'email': user.email,
             'role': 'admin',
             'position':  'N/A',
             'department': 'N/A',
-            'organization': org,
+            'organization': org.id,
         })
         if serializer.is_valid():
-            print(serializer.data)
+            serializer.validated_data['organization'] = org
             serializer.save()
         else:
             raise serializers.ValidationError(serializer.errors)
@@ -70,8 +70,14 @@ def create(request):
 @permission_classes([IsAuthenticated])
 def update(request, id):
     user = request.user
-    organization = Organization.objects.get(id=id)
+    organization = Organization.objects.get(pk=id)
     # employees = organization.employee
     # admins = employees.filter(role='admin')
     # print(admins)
+    return Response(None)
+
+
+@api_view(('Post',))
+@permission_classes([IsAuthenticated])
+def employee(request, id):
     return Response(None)

@@ -5,7 +5,7 @@ from face_embedding.models import Organization
 
 class UserSerializer(serializers.ModelSerializer):
     def to_representation(self, value):
-        user = User.objects.get(id=value)
+        user = User.objects.get(pk =value)
         data = {
             'id': user.id,
             'email': user.email,

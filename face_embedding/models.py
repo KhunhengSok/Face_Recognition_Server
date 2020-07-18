@@ -1,6 +1,4 @@
 from django.db import models
-from picklefield.fields import PickledObjectField
-from django_mysql.models import ListCharField
 from django.utils import timezone
 from django.contrib.auth.models import User
 from django.contrib import admin
@@ -46,7 +44,7 @@ class Person(models.Model):
 
 class Organization(models.Model):
     name = models.CharField(max_length=64,  unique=True, null=False)
-    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='organization')
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='organization', db_column='created_by')
     created_at = models.DateTimeField(editable=False, null=True)
 
     def save(self, *args, **kwargs):
@@ -78,7 +76,7 @@ class Employee(models.Model):
     position = models.CharField(max_length=64, null=False)
     department = models.CharField(max_length=64, null=False)
     role = models.CharField(max_length=8, default=Role.MEMBER, choices=Role.choices)
-    organization = models.ForeignKey(Organization, null=False, related_name='employee', on_delete=models.CASCADE)
+    organization = models.ForeignKey(Organization, null=False, editable=False,  related_name='employee', on_delete=models.CASCADE, db_column='organization')
     email = models.CharField(max_length=64, null=True)
     employed_date = models.DateField(null=True)
     profile_url = models.TextField(null=True, editable=True)
@@ -99,7 +97,7 @@ class Employee(models.Model):
 class FaceEmbedding(models.Model):
     face_embedding = models.TextField(null=False, editable=True, )
     image_url = models.TextField(null=False, editable=True)
-    owner = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name="face", null=False)
+    owner = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name="face", null=False, db_column='owner')
 
     def __str__(self):
         return f"Username: {self.person.first_name} Url:{self.image_url}"
@@ -107,8 +105,8 @@ class FaceEmbedding(models.Model):
 
 class Event(models.Model):
     name = models.CharField(max_length=64, null=False)
-    created_by = models.ForeignKey(User, on_delete=models.CASCADE, null=False, related_name='event')
-    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, null=False, related_name='event')
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, null=False, related_name='event', db_column='created_by')
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, null=False, related_name='event', db_column='organization')
     date = models.DateField(null=False)
     start_time = models.DateTimeField(null=False)
     end_time = models.DateTimeField(null=False)
@@ -118,8 +116,8 @@ class Event(models.Model):
 
 class EventTemplate(models.Model):
     name = models.CharField(max_length=64, null=False)
-    created_by = models.ForeignKey(User, on_delete=models.CASCADE, null=False, related_name='event_template')
-    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, null=False, related_name='event_template')
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, null=False, related_name='event_template', db_column='created_by')
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, null=False, related_name='event_template', db_column='organization')
     start_time = models.DateTimeField(null=False)
     end_time = models.DateTimeField(null=False)
     repeated_every = models.BigIntegerField(default=None)
