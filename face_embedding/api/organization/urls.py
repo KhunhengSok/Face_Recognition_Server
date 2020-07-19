@@ -3,10 +3,11 @@ from . import views
 
 urlpatterns = [
     path('create', views.create, name='create'),
-    path('user', views.index, name='index'),
-    path('<id>', views.show, name='index'),
-    path('<id>/update', views.update, name='index'),
-    path('<id>/employee', views.employee, name='index'),
+    path('<id>', views.show, name='show'),
+    path('<id>/update', views.update, name='update'),
+    path('<id>/employees', views.show_employees, name='show_employees'),
+    path('<id>/events', views.show_events, name='show_events'),
+
 
     # ToDo: add employees
 ]

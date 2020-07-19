@@ -3,15 +3,15 @@ from django.contrib.auth.models import User
 from face_embedding.models import Organization
 
 
-class UserSerializer(serializers.ModelSerializer):
-    def to_representation(self, value):
-        user = User.objects.get(pk =value)
-        data = {
-            'id': user.id,
-            'email': user.email,
-            'username': user.username
-        }
-        return data
+# class UserSerializer(serializers.ModelSerializer):
+#     def to_representation(self, value):
+#         user = User.objects.get(pk =value)
+#         data = {
+#             'id': user.id,
+#             'email': user.email,
+#             'username': user.username
+#         }
+#         return data
 
 
 class OrganizationSerializer(serializers.ModelSerializer):
@@ -30,8 +30,9 @@ class OrganizationSerializer(serializers.ModelSerializer):
         data['name'] = instance.name.title()
         try:
             user = User.objects.get(username=instance.created_by)
-            user_serializer = UserSerializer(user.id)
-            data['created_by'] = user_serializer.data
+            # user_serializer = UserSerializer(user.id)
+            # set to id
+            data['created_by_id'] = user.id
             return data
         except User.DoesNotExist:
             pass

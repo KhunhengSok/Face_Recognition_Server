@@ -6,5 +6,5 @@ urlpatterns = [
     path('<id>', views.show, name='show'),
     path('<id>/update', views.update, name='update'),
     path('<id>/delete', views.delete, name='delete'),
-    # ToDo: add employees
+
 ]

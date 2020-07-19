@@ -12,3 +12,5 @@ class PersonSerializer(serializers.ModelSerializer):
         output = super(PersonSerializer, self).to_representation(instance)
         output['face_embedding'] = get_face_embedding(output['face_embedding'])
         return output
+
+

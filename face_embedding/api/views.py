@@ -7,7 +7,7 @@ from rest_framework.parsers import JSONParser
 from scipy.spatial.distance import cosine
 
 from .serializer import PersonSerializer
-from face_embedding.models import  FaceEmbedding,  format_face_embedding, get_face_embedding
+from face_embedding.models import Person, FaceEmbedding,  format_face_embedding, get_face_embedding
 
 
 MIN_DISTANCE = 0.38
@@ -76,7 +76,7 @@ def create(request):
             return Response(data=data, status=HTTP_400_BAD_REQUEST)
         
 
-        person = Person(first_name=first_name, last_name=last_name )
+        person= Person(first_name=first_name, last_name=last_name )
         face_embedding =  FaceEmbedding(image_url=image_url, face_embedding=embedding_str, person=person)
 
         # serializer = PersonSerializer(data=request.data )
@@ -120,24 +120,24 @@ def update(request):
     
 @api_view( ('POST',))
 def compare(request):
-    '''
+    """
         verified: True,
         distance: 0.0f,
         time: 0s,
-        face_id: 
-        person: 
+        face_id:
+        person:
         face_rectangle: {
             top,
             left,
             width,
             height
         }
-        
-    '''
+
+    """
     # source_face_embedding = Person.objects.values('face_embedding')
     person = Person.objects.all()
 
-    #validate request data
+    # validate request data
     try:
         target_face_embedding = request.data['face_embedding']
     except KeyError as e: 
@@ -167,13 +167,13 @@ def compare(request):
 
         return Response(data=data, status=HTTP_400_BAD_REQUEST)
 
-    #start processing    
+    # start processing
     faces = []
     for p in person: 
         try:
             person_faces = FaceEmbedding.objects.filter(person=p)
         except FaceEmbedding.DoesNotExist:
-            #that person doesn't have face_embedding save yet
+            # that person doesn't have face_embedding save yet
             continue
         print(len(person_faces))
         for face in person_faces:

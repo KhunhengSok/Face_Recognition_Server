@@ -36,10 +36,7 @@ def register(request):
                 'token': token.key
             }
         }
-        # data['response'] = 'Successfully register new user'
-        # data['email'] = user.email
-        # data['username'] = user.username
-        # data['token'] = token.key
+
         return Response(data=data, status=HTTP_201_CREATED)
     else:
         data['error'] = userSerializer.errors
@@ -65,7 +62,7 @@ def user(request):
 
 
 # urls localhost:8000/account/login
-@api_view(('Post',))
+@api_view(('Post', 'Get',))
 @permission_classes([])
 def login(request):
     if request.method == "POST":
@@ -88,14 +85,55 @@ def login(request):
             'token':    token.key
         }
         return Response(data, status=HTTP_200_OK)
+    elif request.method == 'GET':
+        try:
+            token = Token.objects.get(user=request.user)
+        except Token.DoesNotExist:
+            token = Token.objects.create(user=request.user)
+        user = User.objects.get(username=request.user)
+        data = {
+            'id':       user.id,
+            'username': user.username,
+            'email':    user.email,
+            'token':    token.key
+        }
+        return Response(data, status=HTTP_200_OK)
 
 
-# urls /account/organizations
+# urls /account/<id>
+@api_view(('Get',))
+@permission_classes([])
+def show(request, id):
+    try:
+        user = User.objects.get(pk=id)
+    except User.DoesNotExist:
+        return Response(HTTP_404_NOT_FOUND)
+    serializer = UserSerializer(user)
+    return Response(serializer.data, HTTP_200_OK)
+
+
+# urls /account/<id>organizations
 @api_view(('Get',))
 @permission_classes([IsAuthenticated])
-def organizations(request):
-    user = request.user
-    orgs = Organization.objects.filter(created_by=user.id).all()
+def show_organizations(request, id):
+    orgs = Organization.objects.filter(created_by=id).all()
     org_serializer = OrganizationSerializer(orgs, many=True)
     # print(org_serializer.is_valid(True))
     return Response(org_serializer.data, HTTP_200_OK)
+
+
+# urls /account/<id>/update
+# @api_view(('Put',))
+# @permission_classes([IsAuthenticated])
+# def update(request, id):
+#     try:
+#         User.objects.get(pk=id)
+#     except User.DoesNotExist:
+#         return Response(HTTP_404_NOT_FOUND)
+#
+#     serializer = UserSerializer(instance=user, data=request.data, partial=True)
+#     if serializer.is_valid():
+#         serializer.save()
+#         return Response(serializer, HTTP_200_OK)
+#     else:
+#         return Response(serializer.errors, HTTP_400_BAD_REQUEST)

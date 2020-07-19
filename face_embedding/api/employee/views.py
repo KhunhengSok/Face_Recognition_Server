@@ -1,7 +1,7 @@
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.response import Response
 from django.http import JsonResponse
-from rest_framework.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST, HTTP_200_OK, HTTP_404_NOT_FOUND
+from rest_framework.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST, HTTP_200_OK, HTTP_404_NOT_FOUND, HTTP_401_UNAUTHORIZED
 from rest_framework import serializers
 
 from rest_framework.authtoken.models import Token
@@ -11,7 +11,7 @@ from django.contrib.auth.models import User, AnonymousUser
 
 from .serializers import EmployeeSerializer
 from face_embedding.models import Organization, Employee
-
+from face_embedding.api.face_embedding.serializers import FaceEmbeddingSerializer
 
 def validate_organization_admin(request, organization):
     user = request.user
@@ -21,10 +21,8 @@ def validate_organization_admin(request, organization):
         return False
     else:
         for employee in employees:
-            print(employee)
-            print(employee.id, user.id)
             # same name under same organization
-            if employee.name == user.id:
+            if employee.name == user.username:
                 return True
         return False
 
@@ -67,6 +65,12 @@ def create(request):
         data['organization_id'] = organization.id
         serializer = EmployeeSerializer(data=request.data)
 
+        try:
+
+            FaceEmbeddingSerializer()
+        except KeyError:
+            pass
+
         if serializer.is_valid():
             serializer.validated_data['organization'] = organization
             employee = serializer.save()
@@ -84,7 +88,7 @@ def create(request):
 
 
 # urls: /employee/<id>/update
-@api_view(('Post',))
+@api_view(('Post', 'Put'))
 @permission_classes([IsAuthenticated])
 def update(request, id):
     data = request.data
@@ -101,13 +105,10 @@ def update(request, id):
 
         })
     data['organization'] = organization
-    print(organization.id)
-    print(organization)
-    print(organization.employee)
 
     try:
         employee = Employee.objects.get(id=id)
-        serializer = EmployeeSerializer(employee, data=request.data)
+        serializer = EmployeeSerializer(instance=employee, data=request.data, partial=True)
         # serializer.update(employee, validated_data=request.data)
 
         if serializer.is_valid():
@@ -122,3 +123,18 @@ def update(request, id):
             }
         }, HTTP_404_NOT_FOUND)
     return Response(None)
+
+
+# urls: api/emplyoee/<id>/delete
+@api_view(("Delete",))
+@permission_classes([IsAuthenticated])
+def delete(request, id):
+    employee = Employee.objects.get(pk=id)
+    org = employee.organization
+    if validate_organization_admin(request, org):
+        employee.delete()
+        return Response({
+            'message': f'employee {id} deleted'
+        }, HTTP_200_OK)
+    else:
+        return Response(status=HTTP_401_UNAUTHORIZED)

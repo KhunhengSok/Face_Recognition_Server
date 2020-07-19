@@ -9,6 +9,7 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.models import User
 from face_embedding.api.employee.serializers import EmployeeSerializer
+from face_embedding.api.event.serializers import EventSerializer
 
 from .serializers import OrganizationSerializer
 from face_embedding.models import Organization, Employee
@@ -26,16 +27,6 @@ def show(request, id):
     org_serializer = OrganizationSerializer(organization)
 
     return Response(data=org_serializer.data, status=HTTP_200_OK)
-
-
-@api_view(('Get',))
-@permission_classes([IsAuthenticated])
-def index(request):
-    user = request.user
-    orgs = Organization.objects.filter(created_by=user.id).all()
-    org_serializer = OrganizationSerializer(orgs, many=True)
-    # print(org_serializer.is_valid(True))
-    return Response(org_serializer.data, HTTP_200_OK)
 
 
 @api_view(('Post',))
@@ -66,18 +57,46 @@ def create(request):
         return Response(organization.errors)
 
 
-@api_view(('Post',))
+@api_view(('Post', 'Put'))
 @permission_classes([IsAuthenticated])
 def update(request, id):
     user = request.user
-    organization = Organization.objects.get(pk=id)
-    # employees = organization.employee
-    # admins = employees.filter(role='admin')
-    # print(admins)
-    return Response(None)
+    try:
+        org = Organization.objects.get(pk=id)
+        serializer = OrganizationSerializer(instance=org, many=True, partial=True)
+        return Response(serializer.data, status=HTTP_200_OK)
+    except Organization.DoesNotExist:
+        return Response({
+            'message': f'organization {id} not found'
+        }, HTTP_400_BAD_REQUEST)
 
 
-@api_view(('Post',))
+# url: api/organization/<id>/employees
+@api_view(('Get',))
 @permission_classes([IsAuthenticated])
-def employee(request, id):
-    return Response(None)
+def show_employees(request, id):
+    try:
+        org = Organization.objects.get(pk=id)
+        employees = org.employee.all()
+        serializer = EmployeeSerializer(employees, many=True)
+        return Response(serializer.data, status=HTTP_200_OK)
+    except Organization.DoesNotExist:
+        return Response({
+            'message': f'organization {id} not found'
+        }, HTTP_400_BAD_REQUEST)
+
+
+# url: api/organization/<id>/events
+@api_view(('Get',))
+@permission_classes([IsAuthenticated])
+def show_events(request, id):
+    try:
+        org = Organization.objects.get(pk=id)
+    except  Organization.DoesNotExist:
+        return Response({
+            'message': f'organization {id} not found'
+        }, HTTP_400_BAD_REQUEST)
+
+    events = org.event
+    serializer = EventSerializer(events, many=True)
+    return Response(serializer.data, HTTP_200_OK)

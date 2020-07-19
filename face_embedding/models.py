@@ -1,8 +1,6 @@
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
-from django.contrib import admin
-from django.utils.translation import gettext as _
 
 
 def format_face_embedding(array):
@@ -98,26 +96,33 @@ class FaceEmbedding(models.Model):
     face_embedding = models.TextField(null=False, editable=True, )
     image_url = models.TextField(null=False, editable=True)
     owner = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name="face", null=False, db_column='owner')
+    created_at = models.DateTimeField(editable=False, null=True)
+
+    def save(self, *args, **kwargs):
+        """On save, update the updated_at field, and set the created_at when first save"""
+        if not self.id:
+            self.created_at = timezone.now()
+        return super(Employee, self).save(*args, **kwargs)
 
     def __str__(self):
-        return f"Username: {self.person.first_name} Url:{self.image_url}"
+        return f"Username: {self.owner.name} Url:{self.image_url}"
 
 
 class Event(models.Model):
     name = models.CharField(max_length=64, null=False)
-    created_by = models.ForeignKey(User, on_delete=models.CASCADE, null=False, related_name='event', db_column='created_by')
+    created_by = models.ForeignKey(User, editable=False, on_delete=models.CASCADE, null=False, related_name='event', db_column='created_by')
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE, null=False, related_name='event', db_column='organization')
     date = models.DateField(null=False)
-    start_time = models.DateTimeField(null=False)
-    end_time = models.DateTimeField(null=False)
-    attendees = models.ManyToManyField(Employee, related_name='event')
+    start_time = models.TimeField(null=False)
+    end_time = models.TimeField(null=False)
+    attendees = models.ManyToManyField(Employee, related_name='event', null=False, blank=True)
     # repeated_every = models.BigIntegerField(default=None)
 
 
 class EventTemplate(models.Model):
     name = models.CharField(max_length=64, null=False)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, null=False, related_name='event_template', db_column='created_by')
-    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, null=False, related_name='event_template', db_column='organization')
-    start_time = models.DateTimeField(null=False)
-    end_time = models.DateTimeField(null=False)
-    repeated_every = models.BigIntegerField(default=None)
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, null=False, related_name='event_template', db_column='organization', editable=False)
+    start_time = models.TimeField(null=False)
+    end_time = models.TimeField(null=False)
+    repeated_every = models.BigIntegerField(null=True)
