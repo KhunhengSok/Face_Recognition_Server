@@ -1,2 +1,4 @@
 facedetectormlkit-3c450-firebase-adminsdk-xpb59-e6d6af408c
 /env
+/.vscode
+/__pycache__
