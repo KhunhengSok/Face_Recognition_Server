@@ -25,7 +25,7 @@ SECRET_KEY = 'rs+f*b7lj4p+-db=+h&47w7$sn+*+enuu)7--+gpt#rqklwjou'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["https://face-attendance-api.herokuapp.co/", "127.0.0.1"]
+ALLOWED_HOSTS = ["face-attendance-api.herokuapp.co/", "127.0.0.1"]
 
 
 # Application definition
