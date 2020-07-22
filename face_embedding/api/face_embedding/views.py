@@ -13,6 +13,7 @@ from scipy.spatial.distance import cosine
 
 MIN_DISTANCE = 0.38
 
+
 # urls: api/organization/<id>face-embedding/create
 @api_view(('Post',))
 @permission_classes([IsAuthenticated])

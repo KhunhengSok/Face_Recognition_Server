@@ -10,7 +10,7 @@ urlpatterns = [
     path('organization/<id>/face-embedding/', include('face_embedding.api.face_embedding.urls')),
 
 
-    path('create', views.create, name='create'),
-    path('compare', views.compare, name='compare'),
-    path('update', views.update, name='update')
+    # path('create', views.create, name='create'),
+    # path('compare', views.compare, name='compare'),
+    # path('update', views.update, name='update')
 ]
