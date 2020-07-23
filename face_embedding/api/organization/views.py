@@ -63,8 +63,12 @@ def update(request, id):
     user = request.user
     try:
         org = Organization.objects.get(pk=id)
-        serializer = OrganizationSerializer(instance=org, many=True, partial=True)
-        return Response(serializer.data, status=HTTP_200_OK)
+        serializer = OrganizationSerializer(instance=org, data=request.data,  partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=HTTP_200_OK)
+        else:
+            return Response(serializer.errors, HTTP_400_BAD_REQUEST)
     except Organization.DoesNotExist:
         return Response({
             'message': f'organization {id} not found'
