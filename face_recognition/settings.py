@@ -99,13 +99,13 @@ DATABASES = {
     'default': {
         # 'ENGINE': 'django.db.backends.sqlite3',
         # 'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'face_embedding',
-        'USER': 'root',
-        'PASSWORD': '',
-        'HOST': 'localhost',   # Or an IP Address that your DB is hosted on
-        'PORT': '3306',
-        'OPTIONS': {'charset': 'utf8mb4'},
+        # 'ENGINE': 'django.db.backends.mysql',
+        # 'NAME': 'face_embedding',
+        # 'USER': 'root',
+        # 'PASSWORD': '',
+        # 'HOST': 'localhost',   # Or an IP Address that your DB is hosted on
+        # 'PORT': '3306',
+        # 'OPTIONS': {'charset': 'utf8mb4'},
     }
 }
 
