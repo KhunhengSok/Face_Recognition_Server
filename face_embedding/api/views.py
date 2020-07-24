@@ -6,6 +6,7 @@ from rest_framework.parsers import JSONParser
 
 from scipy.spatial.distance import cosine
 
+'''
 from .serializer import PersonSerializer
 from face_embedding.models import Person, FaceEmbedding,  format_face_embedding, get_face_embedding
 
@@ -202,4 +203,4 @@ def compare(request):
    
 
     return Response(data=data, status=HTTP_200_OK)
-
+'''

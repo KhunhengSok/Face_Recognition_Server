@@ -18,26 +18,26 @@ def get_face_embedding(representation_string):
     else:
         return []
 
-
-class Person(models.Model):
-    first_name = models.CharField(max_length=64, null=False)
-    last_name = models.CharField(max_length=64, null=False)
-    # image_url = models.TextField(null=True, editable=True)
-    # face_embedding = models.TextField(null=True, editable=True,)
-
-    created_at = models.DateTimeField(editable=False, null=True)
-    update_at = models.DateTimeField(null=True)
-    # face_embedding = PickledObjectField(null=True, default=None, editable=True)
-
-    def save(self, *args, **kwargs):
-        """On save, update the updated_at field, and set the created_at when first save"""
-        if not self.id:
-            self.created_at = timezone.now()
-        self.update_at = timezone.now()
-        return super(Person,self).save(*args, **kwargs)
-
-    def __str__(self):
-        return f"{self.first_name} {self.last_name}. Created_at: {self.created_at}, updated_at: {self.update_at}"
+#
+# class Person(models.Model):
+#     first_name = models.CharField(max_length=64, null=False)
+#     last_name = models.CharField(max_length=64, null=False)
+#     # image_url = models.TextField(null=True, editable=True)
+#     # face_embedding = models.TextField(null=True, editable=True,)
+#
+#     created_at = models.DateTimeField(editable=False, null=True)
+#     update_at = models.DateTimeField(null=True)
+#     # face_embedding = PickledObjectField(null=True, default=None, editable=True)
+#
+#     def save(self, *args, **kwargs):
+#         """On save, update the updated_at field, and set the created_at when first save"""
+#         if not self.id:
+#             self.created_at = timezone.now()
+#         self.update_at = timezone.now()
+#         return super(Person,self).save(*args, **kwargs)
+#
+#     def __str__(self):
+#         return f"{self.first_name} {self.last_name}. Created_at: {self.created_at}, updated_at: {self.update_at}"
 
 
 class Organization(models.Model):

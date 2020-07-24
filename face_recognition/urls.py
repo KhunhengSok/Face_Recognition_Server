@@ -22,13 +22,14 @@ from drf_yasg import openapi
 
 schema_view = get_schema_view(
     openapi.Info(
-        title="Snippets API",
+        title="Face Recognition API",
         default_version='v1',
-        description="Test description",
+        # description="Test description",
         terms_of_service="https://www.google.com/policies/terms/",
         contact=openapi.Contact(email="contact@snippets.local"),
         license=openapi.License(name="BSD License"),
     ),
+    url='/api',
     public=True,
     permission_classes=(permissions.AllowAny,),
 )
