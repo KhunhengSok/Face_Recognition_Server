@@ -47,7 +47,7 @@ class EmployeeSerializer(serializers.ModelSerializer):
             # data['organization'] = OrganizationSerializer(org).data
             try:
                 faces = FaceEmbedding.objects.filter(owner=instance.id).all()
-                print(faces)
+                # print(faces)
                 # data['faces'] = FaceEmbeddingSerializer(faces, many=True).data
             except FaceEmbedding.DoesNotExist:
                 data['faces'] = []

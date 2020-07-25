@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
-
+import datetime
 
 def format_face_embedding(array):
     return ', '.join(str(ele) for ele in array)
@@ -93,16 +93,16 @@ class Employee(models.Model):
 
 
 class FaceEmbedding(models.Model):
-    face_embedding = models.TextField(null=False, editable=True, )
-    image_url = models.TextField(null=False, editable=True)
+    face_embedding = models.TextField(null=False)
+    image_url = models.TextField(null=False)
     owner = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name="face", null=False, db_column='owner')
-    created_at = models.DateTimeField(editable=False, null=True)
+    created_at = models.DateTimeField(null=True)
 
     def save(self, *args, **kwargs):
         """On save, update the updated_at field, and set the created_at when first save"""
         if not self.id:
             self.created_at = timezone.now()
-        return super(Employee, self).save(*args, **kwargs)
+        return super(FaceEmbedding, self).save(*args, **kwargs)
 
     def __str__(self):
         return f"Username: {self.owner.name} Url:{self.image_url}"
@@ -115,8 +115,17 @@ class Event(models.Model):
     date = models.DateField(null=False)
     start_time = models.TimeField(null=False)
     end_time = models.TimeField(null=False)
-    attendees = models.ManyToManyField(Employee, related_name='event', null=False, blank=True)
+    attendees = models.ManyToManyField(Employee, related_name='event', null=False, blank=True, through='Employee_Event')
     # repeated_every = models.BigIntegerField(default=None)
+
+
+class Employee_Event(models.Model):
+    event = models.ForeignKey(Event, related_name='event', null=False, on_delete=models.CASCADE)
+    employee = models.ForeignKey(Employee, related_name='attendee', null=False, on_delete=models.CASCADE)
+    attend_time = models.TimeField(null=False, default=datetime.datetime.time(datetime.datetime.now()))
+
+    class Meta:
+        unique_together = ('event', 'employee',)
 
 
 class EventTemplate(models.Model):

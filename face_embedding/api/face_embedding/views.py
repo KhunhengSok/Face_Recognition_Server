@@ -15,12 +15,21 @@ MIN_DISTANCE = 0.38
 
 
 # urls: api/organization/<id>face-embedding/create
+'''
+{
+    "owner": "khunheng",
+    "face_embedding": [
+        1,5,5
+    ],
+    "image_url": "https://www.facebook.com"
+}
+'''
 @api_view(('Post',))
 @permission_classes([IsAuthenticated])
 def create(request, id):
     data = request.data
     try:
-        org = Organization.objects.get(pk=id)
+        # org = Organization.objects.get(pk=id)
         employee = Employee.objects.filter(name=data['owner']).filter(organization=id).get()
     except Employee.DoesNotExist:
         return Response({
@@ -32,9 +41,12 @@ def create(request, id):
         }, HTTP_400_BAD_REQUEST)
 
     data['owner'] = employee.id
+
     serializer = FaceEmbeddingSerializer(data=data)
     if serializer.is_valid():
+        serializer.validated_data['owner'] = employee
         face_embedding = serializer.save()
+
         return Response({
             'message': f'Face Embedding with id {face_embedding.id} created successfully '
         }, HTTP_200_OK)
@@ -45,7 +57,7 @@ def create(request, id):
 # urls: api/organization/<id>face-embedding/compare
 @api_view(('Post',))
 @permission_classes([IsAuthenticated])
-def compare_faces(request, id):
+def recognize(request, id):
     target_embedding = request.data['face_embedding']
     try:
         org = Organization.objects.get(pk=id)

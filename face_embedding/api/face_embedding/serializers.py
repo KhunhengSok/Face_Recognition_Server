@@ -26,20 +26,29 @@ class FaceEmbeddingSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = FaceEmbedding
-        fields = '__all__'
-        extra_kwargs: {
-            'image_url': {
-                'write_only': True
-            },
-            'face_embedding': {
-                'write_only': True
-            },
-            'owner': {
-                'write_only': True
-            }
-        }
+        fields = ['image_url', 'face_embedding', 'owner', 'created_at']
+        # extra_kwargs: {
+        #     'image_url': {
+        #         'read_only': True
+        #     },
+        #     'face_embedding': {
+        #         'read_only': True
+        #     },
+        #     'owner': {
+        #         'read_only': True
+        #     }
+        # }
 
     def to_internal_value(self, data):
+        # embedding = data.get('face_embedding')
+        # if not (type(embedding[0]) == int or type(embedding[0]) == float):
+        #     raise serializers.ValidationError({
+        #         'face_embedding': 'face_embedding need to be float or integer'
+        #     })
+        # data['face_embedding'] = format_face_embedding(embedding)
+        # rets = super(FaceEmbeddingSerializer, self).to_internal_value(data=data)
+        # return rets
+
         rets = super(FaceEmbeddingSerializer, self).to_internal_value(data=data)
         embedding = data.get('face_embedding')
         if not (type(embedding[0]) == int or type(embedding[0]) == float):
@@ -48,3 +57,5 @@ class FaceEmbeddingSerializer(serializers.ModelSerializer):
             })
         rets['face_embedding'] = format_face_embedding(embedding)
         return rets
+
+

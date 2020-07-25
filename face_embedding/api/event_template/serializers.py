@@ -32,3 +32,5 @@ class EventTemplateSerializer(serializers.ModelSerializer):
                     raise serializers.ValidationError(
                         {'name': 'Template with this name is already exist in the organization'})
         return value
+
+

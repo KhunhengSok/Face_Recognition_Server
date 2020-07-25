@@ -27,7 +27,7 @@ class OrganizationSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         data = super(OrganizationSerializer, self).to_representation(instance)
-        data['name'] = instance.name.title()
+        # data['name'] = instance.name.title()
         try:
             user = User.objects.get(username=instance.created_by)
             # user_serializer = UserSerializer(user.id)

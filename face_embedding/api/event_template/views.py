@@ -39,6 +39,16 @@ def show(request, id):
     serializer = EventTemplateSerializer(template)
     return Response(serializer.data, HTTP_200_OK)
 
+
+# url: api/face-embedding/create
+'''
+{
+    "organization": "Zzbcbz company",
+    "name": "eb meeting", 
+    "start_time": "12:00",
+    "end_time": "14:00"
+}
+'''
 @api_view(('Post',))
 @permission_classes([IsAuthenticated])
 def create(request):
